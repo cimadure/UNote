@@ -400,20 +400,20 @@ class QPdfView(QGraphicsPixmapItem):
         except ValueError:
             borderLine = {"width": pdf_annots.lineWidth}
 
-        lineAnnot = self.page.addLineAnnot(fStart, fEnd)
+        lineAnnot = self.page.add_line_annot(fStart, fEnd)
 
         lineAnnotInfo = lineAnnot.info
         lineAnnotInfo["subject"] = subj
-        lineAnnot.setInfo(lineAnnotInfo)
+        lineAnnot.set_info(lineAnnotInfo)
 
-        lineAnnot.setBorder(borderLine)
+        lineAnnot.set_border(borderLine)
 
         try:
             lineColor = tuple(map(lambda x: float(x), Preferences.data['formColor']))
         except ValueError as identifier:
             lineColor = norm_rgb.main
 
-        lineAnnot.setColors({"stroke":lineColor})
+        lineAnnot.set_colors({"stroke":lineColor})
         lineAnnot.update()
 
         return lineAnnot
@@ -539,12 +539,12 @@ class QPdfView(QGraphicsPixmapItem):
         corrAnnot = self.getCorrespondingAnnot(annot)
         if corrAnnot:
             try:
-                self.page.deleteAnnot(corrAnnot)
+                self.page.delete_annot(corrAnnot)
             except ValueError as identifier:
                 print(str(identifier))
 
         try:
-            self.page.deleteAnnot(annot)
+            self.page.delete_annot(annot)
         except ValueError as identifier:
             print(str(identifier))
 
@@ -674,7 +674,7 @@ class QPdfView(QGraphicsPixmapItem):
         rect = fitz.Rect(xMin, yMin, xMax, yMax)
 
         if dx < dy:
-            rect = rect.transform(self.page.derotationMatrix)
+            rect = rect.transform(self.page.derotation_matrix)
             # rect = fitz.Rect(xMin, yMax, xMax, yMin)
 
         annot = self.addHighlightAnnot(rect)
@@ -683,14 +683,14 @@ class QPdfView(QGraphicsPixmapItem):
 
 
     def addHighlightAnnot(self, rect):
-        annot = self.page.addHighlightAnnot(rect)
+        annot = self.page.add_highlight_annot(rect)
 
         try:
             markerColor = tuple(map(lambda x: float(x), Preferences.data['markerColor']))
         except ValueError as identifier:
             markerColor = norm_rgb.main
 
-        annot.setColors({"stroke":markerColor})         # make the lines blue
+        annot.set_colors({"stroke":markerColor})         # make the lines blue
         annot.update()
 
         return annot
@@ -743,7 +743,7 @@ class QPdfView(QGraphicsPixmapItem):
         self.ongoingEdit = False
 
     def updateFormPoints(self, qpos):
-        self.formPoints.append(self.qPointToFPoint(qpos)*self.page.derotationMatrix)
+        self.formPoints.append(self.qPointToFPoint(qpos)*self.page.derotation_matrix)
 
 
     def applyFormPoints(self):
@@ -812,7 +812,7 @@ class QPdfView(QGraphicsPixmapItem):
         pointList = list()
         for point in zip(*segment):
             fp = fitz.Point(point[0], point[1])
-            fpt = fp * self.page.derotationMatrix
+            fpt = fp * self.page.derotation_matrix
             pointList.append([fpt.x, fpt.y])
 
         
@@ -843,7 +843,7 @@ class QPdfView(QGraphicsPixmapItem):
         #             pointList[0][it][1]
 
         try:
-            annot = self.page.addInkAnnot(pointList)
+            annot = self.page.add_ink_annot(pointList)
         except RuntimeError as identifier:
             print(str(identifier))
             return
@@ -860,8 +860,8 @@ class QPdfView(QGraphicsPixmapItem):
         except ValueError as identifier:
             freehandColor = norm_rgb.main
 
-        annot.setBorder({"width":penSize})# line thickness, some dashing
-        annot.setColors({"stroke":freehandColor})         # make the lines blue
+        annot.set_border({"width":penSize})# line thickness, some dashing
+        annot.set_colors({"stroke":freehandColor})         # make the lines blue
         annot.update()
 
         return annot
@@ -1432,7 +1432,7 @@ class Renderer(QObject):
         print('Rendering PDF from page ' + str(self.startPage))
         self.start_time = time.time()
 
-        for pIt in range(self.pdf.doc.pageCount):
+        for pIt in range(self.pdf.doc.page_count):
 
             if pIt <= self.startPage + 2 and pIt >= self.startPage - 2:
                 self.loadPdfPageToCurrentView(pIt, posX, posY, self.absZoomFactor)

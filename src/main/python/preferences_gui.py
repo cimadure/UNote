@@ -6,7 +6,7 @@
 # Author: Melvin Strobl
 # ---------------------------------------------------------------
 
-from fbs_runtime.application_context.PySide2 import ApplicationContext
+#from fbs_runtime.application_context.PySide2 import ApplicationContext
 
 import os  # launching external python script
 import sys  # exit script, file parsing
@@ -29,7 +29,7 @@ from guiHelper import GuiHelper
 from preferences_qt_export import Ui_PreferencesDialog
 
 
-
+from pathlib import Path
 
 class App(QObject):
     COMPANY_NAME = "MSLS"
@@ -142,9 +142,12 @@ class PreferencesGUI(App):
         '''
 
         scriptPath = os.path.dirname(os.path.abspath(__file__)) + '\\'
+        print(scriptPath)
         # absKeysFilePath = os.path.normpath(scriptPath + KEYSFILEPATH)
-        absKeysFilePath = self.appctxt.get_resource('preferences.keys')
-
+        #absKeysFilePath = self.appctxt.get_resource('preferences.keys')
+        scriptPath = os.path.dirname(os.path.abspath(__file__))
+        absKeysFilePath = Path(scriptPath,'preferences.keys').absolute()
+        print(absKeysFilePath)
         keysFileContent = readFile(absKeysFilePath)
 
         for key in keysFileContent['lines']:

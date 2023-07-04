@@ -10,7 +10,15 @@
 # ----------------------------------------------------------
 # Import region
 # ----------------------------------------------------------
-from fbs_runtime.application_context.PySide2 import ApplicationContext
+#from fbs_runtime.application_context.PySide2 import ApplicationContext
+
+#from PySide2 import ApplicationContext
+from PySide2.QtWidgets import (
+    QApplication,
+    QHBoxLayout,
+    QPushButton,
+    QWidget,
+)
 
 import argparse  # parsing cmdline arguments
 import os  # launching external python script
@@ -36,12 +44,15 @@ from unote_qt_export import Ui_MainWindow
 print('Dependencies loaded')
 
 class App(QObject):
-    appctxt = ApplicationContext()
-
+    #appctxt = ApplicationContext()
+    appctxt = QApplication([])    
     homeDir = Path.home() / "UNote"
     newPdf = homeDir / "new.pdf"
 
-    ICONPATH = appctxt.get_resource('icon.png')
+#    ICONPATH = appctxt.get_resource('icon.png')
+
+    ICONPATH = QIcon('icon.png')
+
     CURVERSION = "2020.01"
 
     DONATEURL   = "https://www.paypal.me/vinstrobl/coffee"
@@ -112,7 +123,7 @@ class UNote(App):
         self.ui.setupUi(self.MainWindow)
 
         # Load the icon
-        self.MainWindow.setWindowIcon(QIcon(self.ICONPATH))
+#        self.MainWindow.setWindowIcon(QIcon(self.ICONPATH))
 
         # self.appctxt.app.setAttribute(Qt.AA_SynthesizeTouchForUnhandledMouseEvents)
         # self.appctxt.app.setAttribute(Qt.AA_SynthesizeMouseForUnhandledTouchEvents)
@@ -158,8 +169,9 @@ class UNote(App):
         '''
         self.MainWindow.show()
 
-        result = self.appctxt.app.exec_()
-
+#        result = self.appctxt.app.exec_()
+        result = self.appctxt.exec_()
+        
         self.onQApplicationQuit()
 
         sys.exit(result)
@@ -210,7 +222,8 @@ class UNote(App):
         Connects all the buttons to the right receivers
         '''
         # Add the exit method
-        self.ui.actionExit.triggered.connect(self.appctxt.app.quit)
+#        self.ui.actionExit.triggered.connect(self.appctxt.app.quit)
+        self.ui.actionExit.triggered.connect(self.appctxt.quit())
 
         # Open Preferences
         self.ui.actionPreferences.triggered.connect(lambda: self.receiversInst.openPreferencesReceiver(self.preferencesGui))

@@ -2,6 +2,12 @@ import os
 import fitz
 from PIL import Image, ImageQt
 
+from PySide2 import QtGui
+from PySide2.QtGui import QImage, QImageReader, QPixmap
+
+from PySide2.QtWidgets import QApplication, QLabel
+from PySide2.QtGui import QImage, QPixmap
+
 
 class pdfEngine():
     filename = None
@@ -27,7 +33,7 @@ class pdfEngine():
         self.filename = filename
 
         # Insert empty page
-        self.doc.newPage(0)
+        self.doc.new_page(0)
 
         self.savePdfAs(self.filename)
 
@@ -143,13 +149,43 @@ class pdfEngine():
 
     def renderPixmap(self, pageNumber=0, mat = None, clip = None, alpha = False):
         try:
-            return self.doc[pageNumber].getPixmap(matrix = mat, clip = clip, alpha = alpha)
+            return self.doc[pageNumber].get_pixmap(matrix = mat, clip = clip, alpha = alpha)
         except RuntimeError as identifier:
             raise RuntimeError(identifier)
 
 
     def getQImage(self, pixmap):
         mode = "RGBA" if pixmap.alpha else "RGB"
-
         img = Image.frombytes(mode, [pixmap.width, pixmap.height], pixmap.samples)
-        return ImageQt.ImageQt(img)
+        #return ImageQt.ImageQt(img)
+        #return QtGui.QPixmap.fromImage(img)
+        #return pil2pixmap(img)
+#        image = QImage(img, [pixmap.width, pixmap.height], mode)
+        #return QPixmap.fromImage(image)
+
+        image=QImage(pixmap.samples,
+                     pixmap.width, pixmap.height,
+                     pixmap.stride, # length of one image line in bytes
+                     QImage.Format_RGB888)
+        return image
+        #return pil2pixmap(pixmap)
+
+
+
+def pil2pixmap(im):
+
+    if im.mode == "RGB":
+        r, g, b = im.split()
+        im = Image.merge("RGB", (b, g, r))
+    elif  im.mode == "RGBA":
+        r, g, b, a = im.split()
+        im = Image.merge("RGBA", (b, g, r, a))
+    elif im.mode == "L":
+        im = im.convert("RGBA")
+    # Bild in RGBA konvertieren, falls nicht bereits passiert
+    im2 = im.convert("RGBA")
+    data = im2.tobytes("raw", "RGBA")
+    qim = QtGui.QImage(data, im.size[0], im.size[1], QtGui.QImage.Format_ARGB32)
+    #pixmap = QtGui.QPixmap.fromImage(qim)
+    #return pixmap
+    return qim
